@@ -10,6 +10,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
 COPY backend/static ./static
 
+# Bundle mock data so it's available without a volume mount (e.g. Railway)
+COPY mock_data /data/mock
+
 # Persistent DB lives here (mounted as a volume in compose)
 RUN mkdir -p /app/data
 
