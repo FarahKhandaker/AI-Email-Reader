@@ -1,0 +1,22 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-email-agent
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Path inside the container where mock data is mounted (see volumes below)
+      MOCK_DATA_PATH: /data/mock/emails.json
+    volumes:
+      # Mock dataset (read-only) so you can edit emails without rebuilding
+      - ./mock_data:/data/mock:ro
+      # Persistent SQLite DB so processed/important state survives restarts
+      - agent-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  agent-data:

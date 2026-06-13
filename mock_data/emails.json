@@ -1,0 +1,72 @@
+[
+  {
+    "id": "msg-1001",
+    "from": "sarah.client@bigcorp.com",
+    "subject": "URGENT: Your service charged me twice this month",
+    "body": "Hi, I just noticed two identical charges of $499 on my statement for the same invoice. This is the second time this has happened and I need it refunded today. Please escalate.",
+    "received_at": "2026-06-07T09:12:00Z"
+  },
+  {
+    "id": "msg-1002",
+    "from": "alerts@stripe.com",
+    "subject": "Payment failed for invoice #INV-2231",
+    "body": "We were unable to process the payment of $1,200 for your subscription. The card was declined. Please update your payment method to avoid service interruption.",
+    "received_at": "2026-06-07T09:30:00Z"
+  },
+  {
+    "id": "msg-1003",
+    "from": "newsletter@medium.com",
+    "subject": "Your weekly digest: 5 articles you might like",
+    "body": "Here are this week's top stories handpicked for you. Unsubscribe anytime at the link below.",
+    "received_at": "2026-06-07T07:00:00Z"
+  },
+  {
+    "id": "msg-1004",
+    "from": "ops@statuspage.io",
+    "subject": "[ALERT] Production API is returning 503 errors",
+    "body": "Our monitoring detected that the production API has been down for 4 minutes. Error rate is 100%. On-call engineer has been paged. This is a critical outage.",
+    "received_at": "2026-06-07T10:01:00Z"
+  },
+  {
+    "id": "msg-1005",
+    "from": "no-reply@promotions.shop",
+    "subject": "\ud83d\udd25 50% OFF EVERYTHING - 24 HOURS ONLY!!!",
+    "body": "Don't miss our biggest sale of the year! Click now to claim your discount before it expires. Limited stock!",
+    "received_at": "2026-06-07T06:45:00Z"
+  },
+  {
+    "id": "msg-1006",
+    "from": "james.wong@partner.io",
+    "subject": "Quick question about next week's roadmap sync",
+    "body": "Hey, are we still on for the roadmap sync Tuesday at 3pm? Let me know if the time still works for you. No rush.",
+    "received_at": "2026-06-07T08:20:00Z"
+  },
+  {
+    "id": "msg-1007",
+    "from": "angry.customer@gmail.com",
+    "subject": "Extremely disappointed - cancelling my account",
+    "body": "I have been a customer for three years and the app has been broken for a week. Nobody responds to my tickets. If this is not fixed I am cancelling and posting a review everywhere.",
+    "received_at": "2026-06-07T10:15:00Z"
+  },
+  {
+    "id": "msg-1008",
+    "from": "linkedin@e.linkedin.com",
+    "subject": "You appeared in 9 searches this week",
+    "body": "See who's been looking at your profile. Upgrade to Premium to see all your search appearances.",
+    "received_at": "2026-06-07T05:30:00Z"
+  },
+  {
+    "id": "msg-1009",
+    "from": "billing@cloudhost.com",
+    "subject": "Invoice receipt - $89.00 paid successfully",
+    "body": "Thank you. Your monthly hosting invoice of $89.00 was paid successfully. No action is required.",
+    "received_at": "2026-06-07T04:00:00Z"
+  },
+  {
+    "id": "msg-1010",
+    "from": "security@accounts.google.com",
+    "subject": "Security alert: new sign-in on your account",
+    "body": "A new device just signed in to your account from a location we don't recognize. If this wasn't you, secure your account immediately.",
+    "received_at": "2026-06-07T10:40:00Z"
+  }
+]

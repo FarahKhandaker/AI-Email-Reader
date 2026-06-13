@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inbox Triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --panel: #181b23;
+    --line: #252830;
+    --ink: #e2e4eb;
+    --muted: #868b9b;
+    --faint: #50545f;
+    --high: #f06060;
+    --high-bg: #261316;
+    --med: #e8ad3a;
+    --med-bg: #25200d;
+    --low: #5a9ff0;
+    --low-bg: #0f1c2e;
+    --ok: #4ec994;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; padding: 32px 20px 80px; }
+  .wrap { max-width: 900px; margin: 0 auto; }
+
+  header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 8px; flex-wrap: wrap; gap: 16px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: -.3px; }
+  h1 span { color: var(--ok); }
+  .sub { color: var(--muted); font-size: 12px; margin-top: 5px; font-family: var(--mono); }
+
+  .stats { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; min-width: 70px; }
+  .stat .n { font-family: var(--mono); font-size: 20px; font-weight: 500; }
+  .stat .l { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--faint); margin-top: 2px; }
+  .stat.imp .n { color: var(--ok); }
+
+  .bar { display: flex; align-items: center; gap: 12px; margin: 20px 0 16px; color: var(--muted); font-size: 12px; font-family: var(--mono); }
+  .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(78,201,148,.5); animation: p 2.4s infinite; flex-shrink: 0; }
+  @keyframes p { 0% { box-shadow: 0 0 0 0 rgba(78,201,148,.5); } 70% { box-shadow: 0 0 0 8px rgba(78,201,148,0); } 100% { box-shadow: 0 0 0 0 rgba(78,201,148,0); } }
+
+  button { margin-left: auto; background: var(--panel); color: var(--muted); border: 1px solid var(--line); font-family: var(--mono); font-size: 12px; padding: 7px 13px; border-radius: 7px; cursor: pointer; transition: .15s; }
+  button:hover { color: var(--ink); border-color: var(--faint); }
+
+  .filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .flt { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .4px; text-transform: uppercase; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); cursor: pointer; transition: .15s; margin-left: 0; }
+  .flt:hover { color: var(--ink); border-color: var(--faint); }
+  .flt[data-f="ALL"].active  { color: var(--ok);   border-color: var(--ok);   background: #0d1e17; }
+  .flt[data-f="HIGH"].active { color: var(--high);  border-color: var(--high); background: var(--high-bg); }
+  .flt[data-f="MEDIUM"].active { color: var(--med); border-color: var(--med);  background: var(--med-bg); }
+  .flt[data-f="LOW"].active  { color: var(--low);   border-color: var(--low);  background: var(--low-bg); }
+  .count { font-size: 10px; opacity: .6; margin-left: 3px; }
+
+  .list { display: flex; flex-direction: column; gap: 10px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; position: relative; overflow: hidden; }
+  .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+  .card.HIGH::before   { background: var(--high); }
+  .card.MEDIUM::before { background: var(--med); }
+  .card.LOW::before    { background: var(--low); }
+
+  .row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .tag { font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .5px; padding: 2px 7px; border-radius: 5px; text-transform: uppercase; }
+  .tag.HIGH   { color: var(--high); background: var(--high-bg); }
+  .tag.MEDIUM { color: var(--med);  background: var(--med-bg); }
+  .tag.LOW    { color: var(--low);  background: var(--low-bg); }
+  .cat  { font-family: var(--mono); font-size: 10px; color: var(--muted); background: #1e2130; border: 1px solid var(--line); padding: 2px 7px; border-radius: 5px; letter-spacing: .3px; }
+  .when { margin-left: auto; color: var(--faint); font-size: 11px; font-family: var(--mono); }
+
+  .subject { font-size: 15px; font-weight: 600; letter-spacing: -.1px; margin-bottom: 3px; }
+  .from    { color: var(--muted); font-size: 12px; font-family: var(--mono); margin-bottom: 10px; }
+  .reason  { color: #b8bcc8; font-size: 13px; line-height: 1.55; border-left: 2px solid var(--line); padding-left: 11px; }
+
+  .empty { text-align: center; color: var(--faint); padding: 60px 0; font-family: var(--mono); font-size: 13px; }
+  footer { margin-top: 40px; text-align: center; color: var(--faint); font-size: 11px; font-family: var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Inbox Triage<span>.</span></h1>
+      <div class="sub">important mail, surfaced automatically</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="s-seen">–</div><div class="l">Processed</div></div>
+      <div class="stat imp"><div class="n" id="s-imp">–</div><div class="l">Important</div></div>
+      <div class="stat"><div class="n" id="s-ign">–</div><div class="l">Ignored</div></div>
+    </div>
+  </header>
+
+  <div class="bar">
+    <span class="pulse"></span>
+    <span id="status">connecting…</span>
+    <button id="refresh">Poll now ↻</button>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="flt active" data-f="ALL">All <span class="count" id="c-all"></span></button>
+    <button class="flt" data-f="HIGH">High <span class="count" id="c-high"></span></button>
+    <button class="flt" data-f="MEDIUM">Medium <span class="count" id="c-med"></span></button>
+    <button class="flt" data-f="LOW">Low <span class="count" id="c-low"></span></button>
+  </div>
+
+  <div class="list" id="list"></div>
+  <footer>duplicates suppressed by email id · auto-refresh every 15s</footer>
+</div>
+
+<script>
+const API = location.origin;
+const $ = id => document.getElementById(id);
+let allItems = [];
+let activeFilter = "ALL";
+
+function timeAgo(iso) {
+  const d = new Date(iso), s = (Date.now() - d) / 1000;
+  if (s < 60)    return Math.floor(s) + "s ago";
+  if (s < 3600)  return Math.floor(s / 60) + "m ago";
+  if (s < 86400) return Math.floor(s / 3600) + "h ago";
+  return d.toLocaleDateString();
+}
+function esc(t) { const e = document.createElement('div'); e.textContent = t ?? ""; return e.innerHTML; }
+
+function applyFilter(items, f) {
+  if (f === "HIGH")   return items.filter(n => n.priority === "HIGH");
+  if (f === "MEDIUM") return items.filter(n => n.priority === "MEDIUM");
+  if (f === "LOW")    return items.filter(n => n.priority === "LOW");
+  return items;
+}
+
+function updateCounts(items) {
+  $("c-all").textContent  = items.length;
+  $("c-high").textContent = items.filter(n => n.priority === "HIGH").length;
+  $("c-med").textContent  = items.filter(n => n.priority === "MEDIUM").length;
+  $("c-low").textContent  = items.filter(n => n.priority === "LOW").length;
+}
+
+async function load() {
+  try {
+    const r = await fetch(API + "/api/notifications");
+    const data = await r.json();
+    $("s-seen").textContent = data.stats.total_processed;
+    $("s-imp").textContent  = data.stats.important;
+    $("s-ign").textContent  = data.stats.ignored;
+    $("status").textContent = "polling every " + data.poll_interval_seconds + "s · live";
+    allItems = data.notifications;
+    updateCounts(allItems);
+    render(applyFilter(allItems, activeFilter));
+  } catch (e) {
+    $("status").textContent = "backend unreachable — retrying";
+  }
+}
+
+function render(items) {
+  const list = $("list");
+  if (!items.length) {
+    list.innerHTML = `<div class="empty">${activeFilter === "ALL" ? "No important emails yet. The agent is watching." : "No emails match this filter."}</div>`;
+    return;
+  }
+  list.innerHTML = items.map(n => `
+    <div class="card ${n.priority}">
+      <div class="row1">
+        <span class="tag ${n.priority}">${n.priority}</span>
+        <span class="cat">${esc(n.category)}</span>
+        <span class="when">${timeAgo(n.received_at)}</span>
+      </div>
+      <div class="subject">${esc(n.subject)}</div>
+      <div class="from">${esc(n.from)}</div>
+      <div class="reason">${esc(n.reason)}</div>
+    </div>`).join("");
+}
+
+document.getElementById("filters").addEventListener("click", e => {
+  const btn = e.target.closest(".flt");
+  if (!btn) return;
+  document.querySelectorAll(".flt").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  activeFilter = btn.dataset.f;
+  render(applyFilter(allItems, activeFilter));
+});
+
+$("refresh").onclick = async () => {
+  $("refresh").textContent = "polling…";
+  await fetch(API + "/api/poll", { method: "POST" });
+  await load();
+  $("refresh").textContent = "Poll now ↻";
+};
+
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>
